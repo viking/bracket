@@ -9,6 +9,7 @@ import (
 
 type Matchup struct {
 	Seeds      [2]uint8
+	Names      [2]string
 	Difficulty float32
 	Winner     uint8
 }
@@ -32,7 +33,14 @@ func (matchup *Matchup) Simulate() {
 }
 
 func (matchup *Matchup) String() string {
-	return fmt.Sprintf("%02d vs. %02d (D: %5.3f) -> %02d", matchup.Seeds[0], matchup.Seeds[1], matchup.Difficulty, matchup.Seeds[matchup.Winner])
+	return fmt.Sprintf("%s vs. %s (D: %5.3f) -> %s", matchup.Names[0], matchup.Names[1], matchup.Difficulty, matchup.Names[matchup.Winner])
+}
+
+func NewMatchup(seed1, seed2 uint8) *Matchup {
+	return &Matchup{
+		Seeds: [2]uint8{seed1, seed2},
+		Names: [2]string{fmt.Sprintf("%02d", seed1), fmt.Sprintf("%02d", seed2)},
+	}
 }
 
 type Round struct {
@@ -56,12 +64,7 @@ func NextRound(name string, other *Round) (round *Round) {
 	for i := range round.Matchups {
 		first := other.Matchups[lower]
 		second := other.Matchups[upper]
-		matchup := &Matchup{
-			Seeds: [2]uint8{
-				first.Seeds[first.Winner],
-				second.Seeds[second.Winner],
-			},
-		}
+		matchup := NewMatchup(first.Seeds[first.Winner], second.Seeds[second.Winner])
 		matchup.Simulate()
 
 		round.Matchups[i] = matchup
@@ -116,9 +119,7 @@ func main() {
 		high := uint8(1)
 		low := uint8(16)
 		for i := range region.RoundTwo.Matchups {
-			matchup := &Matchup{
-				Seeds: [2]uint8{high, low},
-			}
+			matchup := NewMatchup(high, low)
 			matchup.Simulate()
 			region.RoundTwo.Matchups[i] = matchup
 
