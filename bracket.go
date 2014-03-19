@@ -57,13 +57,13 @@ func (round *Round) String() string {
 	return strings.Join(results, "\n")
 }
 
-func NextRound(name string, other *Round) (round *Round) {
-	round = &Round{Name: name, Matchups: make([]*Matchup, len(other.Matchups)/2)}
+func NextRound(name string, matchups []*Matchup) (round *Round) {
+	round = &Round{Name: name, Matchups: make([]*Matchup, len(matchups)/2)}
 	lower := 0
-	upper := len(other.Matchups) - 1
+	upper := len(matchups) - 1
 	for i := range round.Matchups {
-		first := other.Matchups[lower]
-		second := other.Matchups[upper]
+		first := matchups[lower]
+		second := matchups[upper]
 		matchup := NewMatchup(first.Seeds[first.Winner], second.Seeds[second.Winner])
 		matchup.Simulate()
 
@@ -127,9 +127,9 @@ func main() {
 			low--
 		}
 
-		region.RoundThree = NextRound("3rd Round", region.RoundTwo)
-		region.SweetSixteen = NextRound("Sweet Sixteen", region.RoundThree)
-		region.EliteEight = NextRound("Elite Eight", region.SweetSixteen)
+		region.RoundThree = NextRound("3rd Round", region.RoundTwo.Matchups)
+		region.SweetSixteen = NextRound("Sweet Sixteen", region.RoundThree.Matchups)
+		region.EliteEight = NextRound("Elite Eight", region.SweetSixteen.Matchups)
 
 		fmt.Println(region)
 	}
