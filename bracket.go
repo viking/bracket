@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"math/rand"
+	"os"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -108,7 +110,25 @@ func NewRegion(name string) *Region {
 }
 
 func main() {
-	rand.Seed(time.Now().Unix())
+	var (
+		seed int64
+		err  error
+	)
+
+	if len(os.Args) > 1 {
+		var intSeed int
+		intSeed, err = strconv.Atoi(os.Args[1])
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+		seed = int64(intSeed)
+	} else {
+		seed = time.Now().Unix()
+	}
+	fmt.Printf("Seed: %d\n", seed)
+	rand.Seed(seed)
+
 	regions := []*Region{
 		NewRegion("South"),
 		NewRegion("East"),
