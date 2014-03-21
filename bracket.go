@@ -67,6 +67,10 @@ func NextRound(name string, matchups []*Matchup) (round *Round) {
 		first := matchups[lower]
 		second := matchups[upper]
 		matchup := NewMatchup(first.Seeds[first.Winner], second.Seeds[second.Winner])
+		matchup.Names = [2]string{
+			first.Names[first.Winner],
+			second.Names[second.Winner],
+		}
 		matchup.Simulate()
 
 		round.Matchups[i] = matchup
@@ -131,9 +135,9 @@ func main() {
 
 	regions := []*Region{
 		NewRegion("South"),
-		NewRegion("East"),
 		NewRegion("West"),
 		NewRegion("Midwest"),
+		NewRegion("East"),
 	}
 	for _, region := range regions {
 		high := uint8(1)
@@ -153,4 +157,22 @@ func main() {
 
 		fmt.Println(region)
 	}
+
+	eliteEightMatchups := make([]*Matchup, 4)
+	for i, region := range regions {
+		eliteEightMatchups[i] = region.EliteEight.Matchups[0]
+	}
+	finalFour := NextRound("Final Four", eliteEightMatchups)
+	finalFour.Matchups[0].Names = [2]string{
+		fmt.Sprintf("%s (%s)", finalFour.Matchups[0].Names[0], regions[0].Name),
+		fmt.Sprintf("%s (%s)", finalFour.Matchups[0].Names[1], regions[3].Name),
+	}
+	finalFour.Matchups[1].Names = [2]string{
+		fmt.Sprintf("%s (%s)", finalFour.Matchups[1].Names[0], regions[1].Name),
+		fmt.Sprintf("%s (%s)", finalFour.Matchups[1].Names[1], regions[2].Name),
+	}
+	fmt.Println(finalFour)
+
+	final := NextRound("Final", finalFour.Matchups)
+	fmt.Println(final)
 }
